@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,23 +30,11 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -97,7 +86,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine implements DataApi.DataListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    private class Engine extends CanvasWatchFaceService.Engine {
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
@@ -118,12 +107,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         float mDateYOffset;
         float mTempYOffset;
 
-        int icon;
-
-        Double highTemp, lowTemp;
-
-        GoogleApiClient googleApiClient;
-
         SimpleDateFormat dateFormat;
 
         /**
@@ -136,14 +119,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
-            googleApiClient = new GoogleApiClient.Builder(SunshineWatchFace.this)
-                    .addApi(Wearable.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-
-            googleApiClient.connect();
-
             setWatchFaceStyle(new WatchFaceStyle.Builder(SunshineWatchFace.this)
                     .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
@@ -152,7 +127,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             Resources resources = SunshineWatchFace.this.getResources();
             mTimeYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mDateYOffset = 140;
-            mTempYOffset = 180;
+            mTempYOffset = 170;
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.background));
@@ -283,12 +258,23 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             String dateText = dateFormat.format(System.currentTimeMillis());
             canvas.drawText(dateText, bounds.centerX() - (mDatePaint.measureText(dateText)) / 2, mDateYOffset, mDatePaint);
 
-            String tempText = highTemp + " " + lowTemp;
+            SharedPreferences prefs = getSharedPreferences("Prefs", MODE_PRIVATE);
+            String hi = prefs.getString("high_temp", "");
+            String lo = prefs.getString("low_temp", "");
+            int id = prefs.getInt("icon_id", 0);
+
+
+            String tempText = hi + " " + lo;
             canvas.drawText(tempText, bounds.centerX() - (mTempPaint.measureText(tempText)) / 2, mTempYOffset, mTempPaint);
 
-//                Bitmap bitmap = BitmapFactory.decodeResource(getApplicationContext().getResources(), icon);
-//
-//                canvas.drawBitmap(bitmap, bounds.centerX(), 190, null);
+//            if (id != 0) {
+//                Drawable drawable = getApplicationContext().getResources().getDrawable(id);
+//                if (drawable instanceof BitmapDrawable) {
+//                    Bitmap bitmap;
+//                    bitmap = ((BitmapDrawable) drawable).getBitmap();
+//                    canvas.drawBitmap(bitmap, 70, 200, null);
+//                }
+//            }
         }
 
         /**
@@ -323,44 +309,5 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
         }
 
-        @Override
-        public void onConnected(@Nullable Bundle bundle) {
-            Wearable.DataApi.addListener(googleApiClient, this);
-        }
-
-        @Override
-        public void onConnectionSuspended(int i) {
-
-        }
-
-        @Override
-        public void onDataChanged(DataEventBuffer dataEventBuffer) {
-
-            for (DataEvent event : dataEventBuffer) {
-
-                if (event.getType() == DataEvent.TYPE_CHANGED) {
-
-                    DataItem item = event.getDataItem();
-
-                    if (item.getUri().getPath().equals("/weather_data")) {
-
-                        DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-
-                        highTemp = dataMap.getDouble("high");
-                        lowTemp = dataMap.getDouble("low");
-                        icon = dataMap.getInt("icon");
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        @Override
-        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-        }
     }
 }

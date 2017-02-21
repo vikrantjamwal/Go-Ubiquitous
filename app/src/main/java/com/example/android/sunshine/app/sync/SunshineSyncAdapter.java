@@ -373,10 +373,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                     googleApiClient.connect();
 
                     PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/weather_data");
-                    putDataMapRequest.getDataMap().putDouble("high", high);
-                    putDataMapRequest.getDataMap().putDouble("low", low);
+                    putDataMapRequest.getDataMap().putString("high", Utility.formatTemperature(context, high));
+                    putDataMapRequest.getDataMap().putString("low", Utility.formatTemperature(context, low));
                     putDataMapRequest.getDataMap().putInt("icon", iconId);
-                    putDataMapRequest.getDataMap().putInt("value", (int) System.currentTimeMillis());
 
                     PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
 
