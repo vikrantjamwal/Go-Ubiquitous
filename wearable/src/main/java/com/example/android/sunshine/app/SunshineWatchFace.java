@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -93,6 +95,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         Paint mTextPaint;
         Paint mDatePaint;
         Paint mTempPaint;
+        Paint mIconPaint;
         boolean mAmbient;
         Time mTime;
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
@@ -144,6 +147,11 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             mTempPaint = new Paint();
             mTempPaint = createTextPaint(resources.getColor(R.color.temp_text));
             mTempPaint.setTextSize(35);
+
+            mIconPaint = new Paint();
+            mIconPaint.setAntiAlias(true);
+            mIconPaint.setFilterBitmap(true);
+            mIconPaint.setDither(true);
 
             mTime = new Time();
         }
@@ -267,14 +275,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             String tempText = hi + " " + lo;
             canvas.drawText(tempText, bounds.centerX() - (mTempPaint.measureText(tempText)) / 2, mTempYOffset, mTempPaint);
 
-//            if (id != 0) {
-//                Drawable drawable = getApplicationContext().getResources().getDrawable(id);
-//                if (drawable instanceof BitmapDrawable) {
-//                    Bitmap bitmap;
-//                    bitmap = ((BitmapDrawable) drawable).getBitmap();
-//                    canvas.drawBitmap(bitmap, 70, 200, null);
-//                }
-//            }
+            if (id != 0) {
+                Bitmap bitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getApplicationContext().getResources(), id), 48, 48, true);
+                canvas.drawBitmap(bitmap, 80, 200, mIconPaint);
+            }
         }
 
         /**

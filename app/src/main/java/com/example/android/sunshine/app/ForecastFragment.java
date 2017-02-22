@@ -17,10 +17,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -323,16 +320,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             double high = cursor.getDouble(INDEX_MAX_TEMP);
             double low = cursor.getDouble(INDEX_MIN_TEMP);
 
-            int iconId = Utility.getIconResourceForWeatherCondition(weatherId);
-            Resources resources = context.getResources();
-            Bitmap largeIcon = BitmapFactory.decodeResource(resources,
-                    Utility.getArtResourceForWeatherCondition(weatherId));
-            String title = context.getString(R.string.app_name);
 
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/weather_data");
             putDataMapRequest.getDataMap().putString("high", Utility.formatTemperature(context, high));
             putDataMapRequest.getDataMap().putString("low", Utility.formatTemperature(context, low));
-            putDataMapRequest.getDataMap().putInt("icon", iconId);
+            putDataMapRequest.getDataMap().putInt("icon", Utility.getArtResourceForWeatherCondition(weatherId));
             putDataMapRequest.getDataMap().putLong("value", System.currentTimeMillis());
 
             PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();

@@ -1,7 +1,6 @@
 package com.example.android.sunshine.app;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.DataEvent;
@@ -35,8 +34,6 @@ public class MyService extends WearableListenerService {
                     String high = dataMap.getString("high");
                     String low = dataMap.getString("low");
                     int iconId = dataMap.getInt("icon");
-
-                    Log.e("TAG", high+" "+low);
 
                     SharedPreferences.Editor editor = getSharedPreferences("Prefs", MODE_PRIVATE).edit();
                     editor.putString("high_temp", high);
