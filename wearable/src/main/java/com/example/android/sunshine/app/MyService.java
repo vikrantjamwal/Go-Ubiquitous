@@ -33,12 +33,12 @@ public class MyService extends WearableListenerService {
 
                     String high = dataMap.getString("high");
                     String low = dataMap.getString("low");
-                    int iconId = dataMap.getInt("icon");
+                    int weatherId = dataMap.getInt("icon");
 
                     SharedPreferences.Editor editor = getSharedPreferences("Prefs", MODE_PRIVATE).edit();
                     editor.putString("high_temp", high);
                     editor.putString("low_temp", low);
-                    editor.putInt("icon_id", iconId);
+                    editor.putInt("icon_id", weatherId);
                     editor.commit();
 
                 }

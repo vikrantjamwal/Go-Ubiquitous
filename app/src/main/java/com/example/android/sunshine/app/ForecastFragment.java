@@ -324,8 +324,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/weather_data");
             putDataMapRequest.getDataMap().putString("high", Utility.formatTemperature(context, high));
             putDataMapRequest.getDataMap().putString("low", Utility.formatTemperature(context, low));
-            putDataMapRequest.getDataMap().putInt("icon", Utility.getArtResourceForWeatherCondition(weatherId));
-            putDataMapRequest.getDataMap().putLong("value", System.currentTimeMillis());
+            putDataMapRequest.getDataMap().putInt("icon", weatherId);
 
             PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
 
